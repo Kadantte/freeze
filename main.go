@@ -19,8 +19,8 @@ import (
 	"github.com/charmbracelet/freeze/svg"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
-	"github.com/charmbracelet/x/exp/term/ansi"
-	"github.com/charmbracelet/x/exp/term/ansi/parser"
+	"github.com/charmbracelet/x/ansi"
+	"github.com/charmbracelet/x/ansi/parser"
 	"github.com/mattn/go-isatty"
 	"github.com/muesli/reflow/wordwrap"
 )
@@ -60,9 +60,9 @@ func main() {
 		printErrorFatal("Invalid Usage", err)
 	}
 
+	//nolint: nestif
 	if len(ctx.Args) > 0 {
 		switch ctx.Args[0] {
-
 		case "version":
 			if Version == "" {
 				if info, ok := debug.ReadBuildInfo(); ok && info.Main.Sum != "" {
@@ -85,6 +85,9 @@ func main() {
 	if config.Execute != "" {
 		input, err = executeCommand(config)
 		if err != nil {
+			if input != "" {
+				err = fmt.Errorf("%w\n%s", err, input)
+			}
 			printErrorFatal("Something went wrong", err)
 		}
 		if input == "" {
